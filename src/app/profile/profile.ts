@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 
 @Component({
   selector: 'app-profile',
@@ -18,7 +18,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
           <div class="flex-1 text-center md:text-left">
             <h1 class="font-headline text-3xl md:text-5xl font-black tracking-tight mb-2 text-on-surface uppercase">Audiophile Prime</h1>
             <div class="flex flex-wrap justify-center md:justify-start items-center gap-4 text-on-surface/60 font-medium">
-              <span class="px-3 py-1 bg-surface-container-high rounded-full text-xs tracking-widest uppercase border border-white/5">Elite Collector</span>
+              <span class="px-3 py-1 bg-surface-container-high rounded-full text-xs tracking-widest uppercase border border-on-surface/5">Elite Collector</span>
               <span class="flex items-center gap-1 text-primary">
                 <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">star</span>
                 Collector Reputation: 99%
@@ -27,7 +27,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
             </div>
           </div>
           <div class="flex gap-4 w-full md:w-auto">
-            <button class="flex-1 md:flex-none px-8 py-3 bg-surface-container-high text-on-surface rounded-full font-headline text-xs font-bold uppercase tracking-widest border border-white/10 hover:bg-surface-bright transition-all active:scale-95">
+            <button class="flex-1 md:flex-none px-8 py-3 bg-surface-container-high text-on-surface rounded-full font-headline text-xs font-bold uppercase tracking-widest border border-on-surface/10 hover:bg-surface-bright transition-all active:scale-95">
               编辑资料
             </button>
           </div>
@@ -35,7 +35,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
       </section>
 
       <section class="mb-12">
-        <a href="#" class="group relative block w-full overflow-hidden rounded-2xl bg-surface-container-low border border-white/5 p-8 transition-all hover:bg-surface-container-high">
+        <a href="#" class="group relative block w-full overflow-hidden rounded-2xl bg-surface-container-low border border-on-surface/5 p-8 transition-all hover:bg-surface-container-high">
           <div class="flex items-center justify-between relative z-10">
             <div class="flex items-center gap-6">
               <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
@@ -66,18 +66,38 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
         </aside>
 
         <section class="lg:col-span-9">
-          <div class="flex items-center justify-between mb-8 border-b border-white/5">
-            <div class="flex gap-12">
-              <button class="pb-4 border-b-2 border-primary text-on-surface font-headline font-bold uppercase tracking-widest text-sm">正在买入</button>
-              <button class="pb-4 border-b-2 border-transparent text-on-surface/40 hover:text-on-surface transition-colors font-headline font-bold uppercase tracking-widest text-sm">正在卖出</button>
+          <div class="flex items-center justify-between mb-8 border-b border-on-surface/5">
+            <div class="flex gap-12 relative">
+              <button 
+                (click)="activeTab.set('buying')"
+                class="pb-4 border-b-2 font-headline font-bold uppercase tracking-widest text-sm transition-all duration-300"
+                [class]="activeTab() === 'buying' ? 'border-primary text-on-surface' : 'border-transparent text-on-surface/40 hover:text-on-surface'">
+                正在买入
+              </button>
+              <button 
+                (click)="activeTab.set('selling')"
+                class="pb-4 border-b-2 font-headline font-bold uppercase tracking-widest text-sm transition-all duration-300"
+                [class]="activeTab() === 'selling' ? 'border-primary text-on-surface' : 'border-transparent text-on-surface/40 hover:text-on-surface'">
+                正在卖出
+              </button>
             </div>
             <div class="pb-4">
               <span class="material-symbols-outlined text-on-surface/40 cursor-pointer hover:text-primary transition-colors">filter_list</span>
             </div>
           </div>
-          <div class="flex flex-col items-center justify-center py-20 opacity-20">
-            <span class="material-symbols-outlined text-6xl mb-4">inbox</span>
-            <p class="font-headline uppercase tracking-widest text-sm font-bold">暂无数据</p>
+          
+          <div class="relative min-h-[300px]">
+            @if (activeTab() === 'buying') {
+              <div class="absolute inset-0 flex flex-col items-center justify-center py-20 opacity-20 animate-fade-in-up">
+                <span class="material-symbols-outlined text-6xl mb-4">inbox</span>
+                <p class="font-headline uppercase tracking-widest text-sm font-bold">暂无买入数据</p>
+              </div>
+            } @else {
+              <div class="absolute inset-0 flex flex-col items-center justify-center py-20 opacity-20 animate-fade-in-up">
+                <span class="material-symbols-outlined text-6xl mb-4">outbox</span>
+                <p class="font-headline uppercase tracking-widest text-sm font-bold">暂无卖出数据</p>
+              </div>
+            }
           </div>
         </section>
       </div>
@@ -89,4 +109,6 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
     </div>
   `
 })
-export class ProfileComponent {}
+export class ProfileComponent {
+  activeTab = signal<'buying' | 'selling'>('buying');
+}

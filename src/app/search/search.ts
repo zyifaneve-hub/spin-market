@@ -56,24 +56,14 @@ interface Product {
         </div>
       </section>
 
-      <section class="mb-8 space-y-6">
-        <div class="flex items-center w-full">
-          <div class="flex-1 min-w-0 overflow-x-auto no-scrollbar pb-2 -ml-6 pl-6 pr-4">
-            <div class="flex gap-3">
-              <button (click)="selectedFormat.set(null)" [class.bg-primary-container]="!selectedFormat()" [class.text-on-primary-container]="!selectedFormat()" [class.bg-surface-container-high]="selectedFormat()" [class.text-on-surface]="selectedFormat()" class="px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap shrink-0 transition-colors">全部</button>
-              <button (click)="selectedFormat.set('Vinyl')" [class.bg-primary-container]="selectedFormat() === 'Vinyl'" [class.text-on-primary-container]="selectedFormat() === 'Vinyl'" [class.bg-surface-container-high]="selectedFormat() !== 'Vinyl'" [class.text-on-surface]="selectedFormat() !== 'Vinyl'" class="px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap shrink-0 transition-colors">黑胶 (Vinyl)</button>
-              <button (click)="selectedFormat.set('CD')" [class.bg-primary-container]="selectedFormat() === 'CD'" [class.text-on-primary-container]="selectedFormat() === 'CD'" [class.bg-surface-container-high]="selectedFormat() !== 'CD'" [class.text-on-surface]="selectedFormat() !== 'CD'" class="px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap shrink-0 transition-colors">CD</button>
-              <button (click)="selectedFormat.set('Cassette')" [class.bg-primary-container]="selectedFormat() === 'Cassette'" [class.text-on-primary-container]="selectedFormat() === 'Cassette'" [class.bg-surface-container-high]="selectedFormat() !== 'Cassette'" [class.text-on-surface]="selectedFormat() !== 'Cassette'" class="px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap shrink-0 transition-colors">磁带 (Cassette)</button>
-            </div>
-          </div>
-          <button (click)="isFilterOpen.set(true)" class="flex items-center gap-2 text-on-surface/60 hover:text-primary transition-colors shrink-0 pb-2 pl-2 relative">
-            <span class="text-xs uppercase font-bold tracking-widest">筛选</span>
-            <span class="material-symbols-outlined text-lg">filter_list</span>
-            @if (activeFilterCount() > 0) {
-              <span class="absolute top-0 right-0 w-2 h-2 bg-primary rounded-full"></span>
-            }
-          </button>
-        </div>
+      <section class="mb-8 flex justify-end">
+        <button (click)="isFilterOpen.set(true)" class="flex items-center gap-2 text-on-surface/60 hover:text-primary transition-colors shrink-0 pb-2 pl-2 relative">
+          <span class="text-xs uppercase font-bold tracking-widest">筛选</span>
+          <span class="material-symbols-outlined text-lg">filter_list</span>
+          @if (activeFilterCount() > 0) {
+            <span class="absolute top-0 right-0 w-2 h-2 bg-primary rounded-full"></span>
+          }
+        </button>
       </section>
 
       @if (!searchQuery() && !selectedFormat() && !selectedCondition() && minPrice() === null && maxPrice() === null) {
@@ -100,8 +90,8 @@ interface Product {
               <a [routerLink]="['/product', item.id]" class="group flex flex-col cursor-pointer">
                 <div class="relative aspect-square overflow-hidden bg-surface-container-low mb-4 rounded-lg">
                   <img [src]="item.image" [alt]="item.title" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-110" referrerpolicy="no-referrer" />
-                  <div class="absolute top-2 right-2 bg-[#FF0000] text-white text-[10px] px-2 py-1 font-bold tracking-widest">[{{item.format}}]</div>
-                  <div class="absolute bottom-2 left-2 bg-black/80 backdrop-blur-md px-2 py-1 text-[10px] text-primary border border-primary/20">{{item.condition}}</div>
+                  <div class="absolute top-2 right-2 bg-primary text-on-primary text-[10px] px-2 py-1 font-bold tracking-widest">[{{item.format}}]</div>
+                  <div class="absolute bottom-2 left-2 bg-surface/80 backdrop-blur-md px-2 py-1 text-[10px] text-primary border border-primary/20">{{item.condition}}</div>
                 </div>
                 <div class="space-y-1">
                   <h4 class="font-headline text-sm md:text-base font-bold group-hover:text-primary transition-colors truncate">{{item.title}}</h4>
@@ -150,6 +140,27 @@ interface Product {
           </div>
           
           <div class="p-6 flex-1 overflow-y-auto space-y-8">
+            <!-- Format -->
+            <div>
+              <h3 class="text-sm font-bold tracking-widest uppercase text-on-surface/60 mb-4">格式 (Format)</h3>
+              <div class="flex flex-wrap gap-3">
+                @for (fmt of formats; track fmt.value) {
+                  <button 
+                    (click)="selectedFormat.set(selectedFormat() === fmt.value ? null : fmt.value)"
+                    class="px-4 py-2 rounded-lg border text-sm font-medium transition-colors"
+                    [class.bg-primary-container]="selectedFormat() === fmt.value"
+                    [class.text-on-primary-container]="selectedFormat() === fmt.value"
+                    [class.border-primary]="selectedFormat() === fmt.value"
+                    [class.border-outline-variant]="selectedFormat() !== fmt.value"
+                    [class.text-on-surface]="selectedFormat() !== fmt.value"
+                    [class.hover:bg-surface-container]="selectedFormat() !== fmt.value"
+                  >
+                    {{fmt.label}}
+                  </button>
+                }
+              </div>
+            </div>
+
             <!-- Condition -->
             <div>
               <h3 class="text-sm font-bold tracking-widest uppercase text-on-surface/60 mb-4">品相 (Condition)</h3>
@@ -224,6 +235,11 @@ export class SearchComponent {
   minPrice = signal<number | null>(null);
   maxPrice = signal<number | null>(null);
 
+  formats = [
+    { value: 'Vinyl', label: '黑胶 (Vinyl)' },
+    { value: 'CD', label: 'CD' },
+    { value: 'Cassette', label: '磁带 (Cassette)' }
+  ];
   conditions = ['M', 'NM', 'VG+', 'VG', 'G'];
 
   products = signal<Product[]>([
@@ -265,6 +281,7 @@ export class SearchComponent {
 
   activeFilterCount = computed(() => {
     let count = 0;
+    if (this.selectedFormat()) count++;
     if (this.selectedCondition()) count++;
     if (this.minPrice() !== null || this.maxPrice() !== null) count++;
     return count;

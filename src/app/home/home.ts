@@ -12,7 +12,7 @@ import { RouterLink } from '@angular/router';
         <p class="font-label text-primary tracking-[0.3em] text-xs uppercase mb-4 opacity-80">Premium Crate Digging</p>
         <h2 class="font-headline text-4xl md:text-8xl font-extrabold tracking-tighter text-on-surface leading-[0.9] max-w-4xl">
           开始淘碟：<br/>
-          <span class="text-primary-container">稀有黑胶</span>与磁带
+          <span class="text-primary-container [.light_&]:text-primary">稀有黑胶</span>与磁带
         </h2>
         <p class="font-body text-on-surface/60 mt-8 max-w-xl text-base md:text-lg leading-relaxed">
           在这里，音乐不只是流媒体。探索来自全球私人收藏家的珍稀首版，让每一次转动都充满仪式感。
@@ -21,7 +21,7 @@ import { RouterLink } from '@angular/router';
       <div class="absolute right-[-10%] top-20 w-[600px] h-[600px] opacity-20 hidden lg:block pointer-events-none">
         <div class="w-full h-full rounded-full border-[40px] border-on-surface/5 flex items-center justify-center animate-[spin_10s_linear_infinite]">
           <div class="w-2/3 h-2/3 rounded-full border-[20px] border-on-surface/10 flex items-center justify-center">
-            <div class="w-1/2 h-1/2 rounded-full bg-primary-container/20"></div>
+            <div class="w-1/2 h-1/2 rounded-full bg-primary-container/20 [.light_&]:bg-primary/20"></div>
           </div>
         </div>
       </div>
@@ -31,7 +31,7 @@ import { RouterLink } from '@angular/router';
       <div class="flex justify-between items-end mb-12">
         <div>
           <h3 class="font-headline text-2xl md:text-3xl font-bold tracking-tight">最新到货</h3>
-          <div class="h-1 w-12 bg-primary-container mt-2"></div>
+          <div class="h-1 w-12 bg-primary-container [.light_&]:bg-primary mt-2"></div>
         </div>
         <div class="flex gap-4">
           <button class="p-2 hover:text-primary transition-colors"><span class="material-symbols-outlined">filter_list</span></button>
@@ -44,8 +44,8 @@ import { RouterLink } from '@angular/router';
           <a [routerLink]="['/product', item.id]" class="group flex flex-col cursor-pointer">
             <div class="relative aspect-square overflow-hidden bg-surface-container-low mb-6 rounded-none">
               <img [src]="item.image" [alt]="item.title" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-110" referrerpolicy="no-referrer" />
-              <div class="absolute top-4 right-4 bg-[#FF0000] text-white text-[10px] px-2 py-1 font-bold tracking-widest">[{{item.format}}]</div>
-              <div class="absolute bottom-4 left-4 bg-black/80 backdrop-blur-md px-2 py-1 text-[10px] text-primary border border-primary/20">{{item.condition}}</div>
+              <div class="absolute top-4 right-4 bg-primary text-on-primary text-[10px] px-2 py-1 font-bold tracking-widest">[{{item.format}}]</div>
+              <div class="absolute bottom-4 left-4 bg-surface/80 backdrop-blur-md px-2 py-1 text-[10px] text-primary border border-primary/20">{{item.condition}}</div>
             </div>
             <div class="space-y-1">
               <h4 class="font-headline text-base md:text-lg font-bold group-hover:text-primary transition-colors">{{item.title}}</h4>
