@@ -74,3 +74,8 @@ if (isMainModule(import.meta.url) || process.env['pm_id']) {
  * Request handler used by the Angular CLI (for dev-server and during build) or Firebase Cloud Functions.
  */
 export const reqHandler = createNodeRequestHandler(app);
+
+/**
+ * Export the Express app so it can be used by Vercel Serverless Functions.
+ */
+export default app;
