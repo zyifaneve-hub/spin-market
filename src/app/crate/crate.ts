@@ -41,24 +41,46 @@ interface Product {
             (input)="onSearchInput($event)"
           />
         </div>
-        <button (click)="isFilterOpen.set(true)" class="flex items-center gap-2 text-on-surface/60 hover:text-primary transition-colors shrink-0 py-2 px-4 rounded-full border border-outline-variant hover:bg-surface-container">
-          <span class="text-xs uppercase font-bold tracking-widest">筛选</span>
-          <span class="material-symbols-outlined text-lg">filter_list</span>
-          @if (activeFilterCount() > 0) {
-            <span class="w-2 h-2 bg-primary rounded-full"></span>
-          }
-        </button>
+        <div class="flex items-center gap-2 shrink-0">
+          <button (click)="isFilterOpen.set(true)" class="flex items-center gap-2 text-on-surface/60 hover:text-primary transition-colors py-2 px-4 rounded-full border border-outline-variant hover:bg-surface-container">
+            <span class="text-xs uppercase font-bold tracking-widest">筛选</span>
+            <span class="material-symbols-outlined text-lg">filter_list</span>
+            @if (activeFilterCount() > 0) {
+              <span class="w-2 h-2 bg-primary rounded-full"></span>
+            }
+          </button>
+          <button (click)="toggleSelectionMode()" class="flex items-center gap-2 text-on-surface/60 hover:text-primary transition-colors py-2 px-4 rounded-full border border-outline-variant hover:bg-surface-container" [class.bg-primary-container]="isSelectionMode()" [class.text-on-primary-container]="isSelectionMode()" [class.border-primary]="isSelectionMode()">
+            <span class="text-xs uppercase font-bold tracking-widest">{{ isSelectionMode() ? '完成' : '管理' }}</span>
+            <span class="material-symbols-outlined text-lg">{{ isSelectionMode() ? 'check' : 'checklist' }}</span>
+          </button>
+        </div>
       </section>
 
       <!-- Search Results -->
       <section class="mt-4">
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
           @for (item of filteredProducts(); track item.id) {
-            <a [routerLink]="['/product', item.id]" class="group flex flex-col cursor-pointer">
+            <a [routerLink]="isSelectionMode() ? null : ['/product', item.id]" 
+               (click)="isSelectionMode() ? toggleSelection(item.id, $event) : null"
+               class="group flex flex-col cursor-pointer relative transition-opacity"
+               [class.opacity-40]="isSelectionMode() && !selectedIds().has(item.id)">
+              
+              @if (isSelectionMode()) {
+                <div class="absolute top-2 left-2 z-20 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors"
+                     [class.bg-primary]="selectedIds().has(item.id)"
+                     [class.border-primary]="selectedIds().has(item.id)"
+                     [class.border-white]="!selectedIds().has(item.id)"
+                     [class.bg-black/20]="!selectedIds().has(item.id)">
+                  @if (selectedIds().has(item.id)) {
+                    <span class="material-symbols-outlined text-on-primary text-sm font-bold">check</span>
+                  }
+                </div>
+              }
+
               <div class="relative aspect-square overflow-hidden bg-surface-container-low mb-4 rounded-lg">
-                <img [src]="item.image" [alt]="item.title" class="w-full h-full object-cover transition-transform duration-700 scale-100 group-hover:scale-110" referrerpolicy="no-referrer" />
-                <div class="absolute top-2 right-2 bg-primary text-on-primary text-[10px] px-2 py-1 font-bold tracking-widest">[{{item.format}}]</div>
-                <div class="absolute bottom-2 left-2 bg-surface/80 backdrop-blur-md px-2 py-1 text-[10px] text-primary border border-primary/20">{{item.condition}}</div>
+                <img [src]="item.image" [alt]="item.title" class="w-full h-full object-cover transition-transform duration-300 hover:scale-110" referrerpolicy="no-referrer" />
+                <div class="absolute top-2 right-2 bg-primary text-on-primary text-[10px] px-2 py-1 font-bold tracking-widest pointer-events-none">[{{item.format}}]</div>
+                <div class="absolute bottom-2 left-2 bg-surface/80 backdrop-blur-md px-2 py-1 text-[10px] text-primary border border-primary/20 pointer-events-none">{{item.condition}}</div>
               </div>
               <div class="space-y-1">
                 <h4 class="font-headline text-sm md:text-base font-bold group-hover:text-primary transition-colors truncate">{{item.title}}</h4>
@@ -81,6 +103,29 @@ interface Product {
         }
       </section>
     </div>
+
+    <!-- Batch Action Bar -->
+    @if (isSelectionMode()) {
+      <div class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-surface-container-high border border-outline-variant shadow-2xl rounded-full px-6 py-4 flex items-center gap-6 z-40 animate-in slide-in-from-bottom-10">
+        <span class="font-headline font-bold text-sm whitespace-nowrap">已选择 {{selectedIds().size}} 项</span>
+        <div class="w-px h-4 bg-outline-variant"></div>
+        <button (click)="sellSelected()" [disabled]="selectedIds().size === 0" class="text-sm font-bold text-primary disabled:opacity-50 transition-opacity flex items-center gap-1 whitespace-nowrap">
+          <span class="material-symbols-outlined text-lg">sell</span>
+          出售
+        </button>
+        <button (click)="deleteSelected()" [disabled]="selectedIds().size === 0" class="text-sm font-bold text-red-500 disabled:opacity-50 transition-opacity flex items-center gap-1 whitespace-nowrap">
+          <span class="material-symbols-outlined text-lg">delete</span>
+          删除
+        </button>
+      </div>
+    }
+
+    <!-- Toast Notification -->
+    @if (toastMessage()) {
+      <div class="fixed top-4 left-1/2 -translate-x-1/2 bg-on-surface text-surface px-6 py-3 rounded-full shadow-lg z-50 animate-in fade-in slide-in-from-top-4 font-body text-sm">
+        {{toastMessage()}}
+      </div>
+    }
 
     <!-- Filter Drawer -->
     @if (isFilterOpen()) {
@@ -156,6 +201,9 @@ interface Product {
 })
 export class CrateComponent {
   isFilterOpen = signal(false);
+  isSelectionMode = signal(false);
+  selectedIds = signal<Set<string>>(new Set());
+  toastMessage = signal<string | null>(null);
 
   searchQuery = signal('');
   selectedFormat = signal<string | null>(null);
@@ -214,5 +262,41 @@ export class CrateComponent {
     this.searchQuery.set('');
     this.selectedFormat.set(null);
     this.selectedCondition.set(null);
+  }
+
+  toggleSelectionMode() {
+    this.isSelectionMode.set(!this.isSelectionMode());
+    this.selectedIds.set(new Set());
+  }
+
+  toggleSelection(id: string, event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+    const current = new Set(this.selectedIds());
+    if (current.has(id)) {
+      current.delete(id);
+    } else {
+      current.add(id);
+    }
+    this.selectedIds.set(current);
+  }
+
+  deleteSelected() {
+    const selected = this.selectedIds();
+    const count = selected.size;
+    this.products.update(prods => prods.filter(p => !selected.has(p.id)));
+    this.toggleSelectionMode();
+    this.showToast(`已成功删除 ${count} 张唱片`);
+  }
+
+  sellSelected() {
+    const count = this.selectedIds().size;
+    this.toggleSelectionMode();
+    this.showToast(`已将 ${count} 张唱片加入出售列表`);
+  }
+
+  showToast(msg: string) {
+    this.toastMessage.set(msg);
+    setTimeout(() => this.toastMessage.set(null), 3000);
   }
 }

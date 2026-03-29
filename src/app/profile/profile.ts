@@ -42,9 +42,13 @@ interface Order {
             </div>
           </div>
           <div class="flex gap-4 w-full md:w-auto">
-            <button class="flex-1 md:flex-none px-8 py-3 bg-surface-container-high text-on-surface rounded-full font-headline text-xs font-bold uppercase tracking-widest border border-on-surface/10 hover:bg-surface-bright transition-all active:scale-95">
+            <a routerLink="/edit-profile" class="flex-1 md:flex-none px-8 py-3 bg-surface-container-high text-on-surface rounded-full font-headline text-xs font-bold uppercase tracking-widest border border-on-surface/10 hover:bg-surface-bright transition-all active:scale-95 text-center flex items-center justify-center">
               编辑资料
-            </button>
+            </a>
+            <a routerLink="/sell" class="flex-1 md:flex-none px-8 py-3 bg-primary text-on-primary rounded-full font-headline text-xs font-bold uppercase tracking-widest hover:brightness-110 transition-all active:scale-95 text-center flex items-center justify-center gap-2">
+              <span class="material-symbols-outlined text-sm">add_circle</span>
+              出售唱片
+            </a>
           </div>
         </div>
       </section>
@@ -108,6 +112,12 @@ interface Order {
                 />
               </div>
               <span class="material-symbols-outlined text-on-surface/40 cursor-pointer hover:text-primary transition-colors shrink-0">filter_list</span>
+              @if (activeTab() === 'selling') {
+                <a routerLink="/sell" class="hidden md:flex items-center gap-1 text-xs font-bold text-primary hover:text-primary-container transition-colors uppercase tracking-widest ml-2">
+                  <span class="material-symbols-outlined text-sm">add</span>
+                  发布
+                </a>
+              }
             </div>
           </div>
           

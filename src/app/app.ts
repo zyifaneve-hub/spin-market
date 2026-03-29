@@ -56,22 +56,33 @@ import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
   `
 })
 export class App {
-  isDark = signal(true);
+  isDark = signal(false);
   private document = inject(DOCUMENT);
   private platformId = inject(PLATFORM_ID);
 
   constructor() {
     // Initialize theme based on current class or system preference
     if (isPlatformBrowser(this.platformId)) {
+      const isDarkClass = this.document.documentElement.classList.contains('dark');
       const isLightClass = this.document.documentElement.classList.contains('light');
-      this.isDark.set(!isLightClass);
+      
+      if (isDarkClass) {
+        this.isDark.set(true);
+      } else if (isLightClass) {
+        this.isDark.set(false);
+      } else {
+        // Default to light
+        this.isDark.set(false);
+      }
     }
     
     effect(() => {
       if (isPlatformBrowser(this.platformId)) {
         if (this.isDark()) {
           this.document.documentElement.classList.remove('light');
+          this.document.documentElement.classList.add('dark');
         } else {
+          this.document.documentElement.classList.remove('dark');
           this.document.documentElement.classList.add('light');
         }
       }

@@ -18,7 +18,7 @@ interface Product {
   imports: [RouterLink],
   template: `
     <div class="px-6 max-w-7xl mx-auto pt-8 pb-24">
-      <section class="mb-8 relative">
+      <section class="mb-2 relative">
         <div class="relative flex items-center group">
           <span class="absolute left-4 text-on-surface/40 group-focus-within:text-primary transition-colors">
             <span class="material-symbols-outlined">search</span>
@@ -56,7 +56,7 @@ interface Product {
         </div>
       </section>
 
-      <section class="mb-8 flex justify-end">
+      <section class="mb-2 flex justify-end">
         <button (click)="isFilterOpen.set(true)" class="flex items-center gap-2 text-on-surface/60 hover:text-primary transition-colors shrink-0 pb-2 pl-2 relative">
           <span class="text-xs uppercase font-bold tracking-widest">筛选</span>
           <span class="material-symbols-outlined text-lg">filter_list</span>
@@ -67,8 +67,8 @@ interface Product {
       </section>
 
       @if (!searchQuery() && !selectedFormat() && !selectedCondition() && minPrice() === null && maxPrice() === null) {
-        <section class="mt-16 border-t border-outline-variant/20 pt-12">
-          <h2 class="text-xs font-black tracking-[0.2em] uppercase text-on-surface/30 mb-8">大家都在搜</h2>
+        <section class="mt-2 border-t border-outline-variant/20 pt-4">
+          <h2 class="text-xs font-black tracking-[0.2em] uppercase text-on-surface/30 mb-4">大家都在搜</h2>
           <div class="flex flex-wrap gap-x-8 gap-y-4">
             <a href="#" (click)="$event.preventDefault(); setSearchQuery('City Pop')" class="text-sm md:text-base font-headline hover:text-primary transition-colors"># City Pop</a>
             <a href="#" (click)="$event.preventDefault(); setSearchQuery('坂本龙一')" class="text-sm md:text-base font-headline hover:text-primary transition-colors"># 坂本龙一</a>
@@ -76,6 +76,38 @@ interface Product {
             <a href="#" (click)="$event.preventDefault(); setSearchQuery('180g')" class="text-sm md:text-base font-headline hover:text-primary transition-colors"># 180g 重磅</a>
             <a href="#" (click)="$event.preventDefault(); setSearchQuery('限定彩色盘')" class="text-sm md:text-base font-headline hover:text-primary transition-colors"># 限定彩色盘</a>
             <a href="#" (click)="$event.preventDefault(); setSearchQuery('初版首印')" class="text-sm md:text-base font-headline hover:text-primary transition-colors"># 初版首印</a>
+          </div>
+        </section>
+
+        <section class="mt-16 border-t border-outline-variant/20 pt-12">
+          <h2 class="text-xs font-black tracking-[0.2em] uppercase text-on-surface/30 mb-8">推荐唱片</h2>
+          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            @for (item of recommendedProducts(); track item.id) {
+              <a [routerLink]="['/product', item.id]" class="group flex flex-col cursor-pointer">
+                <div class="relative aspect-square overflow-hidden bg-surface-container-low mb-4 rounded-lg">
+                  <img [src]="item.image" [alt]="item.title" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-110" referrerpolicy="no-referrer" />
+                  <div class="absolute top-2 right-2 bg-primary text-on-primary text-[10px] px-2 py-1 font-bold tracking-widest">[{{item.format}}]</div>
+                  <div class="absolute bottom-2 left-2 bg-surface/80 backdrop-blur-md px-2 py-1 text-[10px] text-primary border border-primary/20">{{item.condition}}</div>
+                </div>
+                <div class="space-y-1">
+                  <h4 class="font-headline text-sm md:text-base font-bold group-hover:text-primary transition-colors truncate">{{item.title}}</h4>
+                  <p class="font-body text-xs text-on-surface/50 truncate">{{item.artist}}</p>
+                  <div class="flex justify-between items-center pt-2">
+                    <span class="font-headline font-extrabold text-base">¥{{item.price}}</span>
+                    <button (click)="toggleLike($event, item)" 
+                            class="material-symbols-outlined transition-all duration-300 hover:scale-110 active:scale-95"
+                            [class.animate-heart-pop]="item.liked"
+                            [class.text-primary]="item.liked"
+                            [class.text-on-surface]="!item.liked"
+                            [class.opacity-30]="!item.liked"
+                            [class.group-hover:text-primary]="!item.liked"
+                            [style.font-variation-settings]="item.liked ? '&quot;FILL&quot; 1' : '&quot;FILL&quot; 0'">
+                      favorite
+                    </button>
+                  </div>
+                </div>
+              </a>
+            }
           </div>
         </section>
       } @else {
@@ -251,6 +283,10 @@ export class SearchComponent {
     { id: '5', title: 'Random Access Memories', artist: 'Daft Punk', price: 315, format: 'Vinyl', condition: 'VG+', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBwvSqg8xEb6bipZmGJpzr7vg1VbIbl9x5WVNcPrPqcv4G8WWFemnrarrGBILFNUk-0uCNc1190O1Bws-e-p4R7Difvy_09jRcZQtRv5FOyEw1CsWst4VMTb9BK1Moa_SwNFByfyqQbgrOnPhGYLWev4LQ3exd197DFcX_IlMQKBHDeLhgfkPcbDAYzuy3Ybg6jqbqqzyHTxmfTkq8lw9m9_XqLnjk5_tExXDBBP_1gtO1-XPPfMLdG9TDVJYWz2Z7-yXZnau5UD1t1' },
     { id: '6', title: 'A Love Supreme', artist: 'John Coltrane', price: 580, format: 'Vinyl', condition: 'M', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA7QHYX5Rou2YKKZphi474hbUlj7VHVz1t57Oqw0I0_aTWnKWMtsFTFO2nCnrRU38YHtnvxwgoU5lqWv3eMpa1LExjNnBC8yDenDfd3BBYutQX7h42mSTu0vDYgs7Z9uRgOBPzkb5JIJvOWjtpAo6Y54Pb7JBAic4gbSAKck7dbTLZj47jBjDtnp1DIIetYPvLkRLQTojjMIIPcR-1Uvyz-4W0g-dMAPso-OwymQkxzLLqmgVCt5qE4ESS6twVInE5CydBiYHSOvwyE' },
   ]);
+
+  recommendedProducts = computed(() => {
+    return this.products().slice(0, 4);
+  });
 
   filteredProducts = computed(() => {
     return this.products().filter(p => {
